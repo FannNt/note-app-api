@@ -3,6 +3,7 @@ import {z} from "zod";
 import {prisma} from "@/db";
 import {Prisma} from "@/app/generated/prisma/client";
 import bcrypt from "bcrypt"
+import {createToken} from "@/services/JWTService";
 
 export async function POST(req: NextRequest) {
     const User= z.object({
@@ -28,10 +29,13 @@ export async function POST(req: NextRequest) {
             },
         })
 
+        const token = createToken(user.email)
+
          return NextResponse.json({
              id: user.id,
              name: user.name,
-             email: user.email
+             email: user.email,
+             token
          },{status:201})
     }catch(err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
