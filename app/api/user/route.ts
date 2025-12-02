@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
 import {prisma} from "@/db";
 import {Prisma} from "@/app/generated/prisma/client";
+import bcrypt from "bcrypt"
 
 export async function POST(req: NextRequest) {
     const User= z.object({
@@ -17,17 +18,21 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(error.fieldErrors,{status: 400})
     }
+    const encPass = await bcrypt.hash(password,10)
     try {
-    console.log(data)
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
-                password,
+                password: encPass,
             },
         })
 
-         return NextResponse.json(user,{status:201})
+         return NextResponse.json({
+             id: user.id,
+             name: user.name,
+             email: user.email
+         },{status:201})
     }catch(err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
             if (err.code === "P2002") {
@@ -35,12 +40,9 @@ export async function POST(req: NextRequest) {
                     message: "email already use, try another email"
                 }, {status: 400})
             }
-            return  NextResponse.json({
-                message: "database error"
-            },{status:500})
         }else {
             return  NextResponse.json({
-                message: "unknown error"
+                message: `Server error ${err}`
             },{status:500})
         }
     }
