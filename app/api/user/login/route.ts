@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
         })
     }
     const match = await bcrypt.compare(password,user.password)
-    console.log(match)
     if(!match){
         return NextResponse.json({message: "password and email wrong"},{
             status: 400,
