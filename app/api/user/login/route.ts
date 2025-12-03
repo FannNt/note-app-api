@@ -9,7 +9,15 @@ export async function POST(req: NextRequest) {
         email: z.string(),
         password: z.string()
     })
-    const {email, password} = loginScheme.safeParse((await req.json())).data;
+    const data = loginScheme.safeParse((await req.json()))
+    if (!data.success) {
+        const error = z.flattenError((data.error))
+
+        return NextResponse.json({
+            error
+        },{status:400})
+    }
+    const {email, password} = data.data;
     const user = await prisma.user.findFirst({
         where: {
             email

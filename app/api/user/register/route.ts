@@ -5,8 +5,6 @@ import {Prisma} from "@/app/generated/prisma/client";
 import bcrypt from "bcrypt"
 import {createToken} from "@/services/JWTService";
 
-
-
 export async function POST(req: NextRequest) {
     const User= z.object({
         name: z.string().min(5),
@@ -15,12 +13,12 @@ export async function POST(req: NextRequest) {
     })
     const body = await req.json()
     const data = User.safeParse(body)
-    const {name, email, password}  = data.data
     if (!data.success) {
         const error = z.flattenError((data.error))
 
         return NextResponse.json(error.fieldErrors,{status: 400})
     }
+    const {name, email, password}  = data.data
     const encPass = await bcrypt.hash(password,10)
     try {
         const user = await prisma.user.create({
