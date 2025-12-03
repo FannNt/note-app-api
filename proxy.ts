@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 import {NextRequest, NextResponse} from "next/server";
+import {verifyToken} from "@/services/JWTService";
 
 export function proxy(req: NextRequest){
 
@@ -10,8 +10,13 @@ export function proxy(req: NextRequest){
         return NextResponse.next()
     }
     const token = req.headers.get('authorization')?.split(" ")[1];
+    if (!token) {
+        return NextResponse.json({
+            'message': "unauthorized",
+        },{status:401})
+    }
     try {
-        jwt.verify(token, process.env.JWT_SECRET_KEY)
+        verifyToken(token)
         return NextResponse.next()
     }catch(e){
         return NextResponse.json({
