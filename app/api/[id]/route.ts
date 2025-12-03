@@ -17,10 +17,27 @@ export async function GET(req: NextRequest, {params}: {params: Promise<{id:numbe
 
 export async function DELETE(req: NextRequest, {params}: { params: Promise<{ id: number }>}) {
     const id = Number((await params).id)
+    const user = getUser(req)
+    if (!user) {
+        return NextResponse.json({
+            message: "unauthorized"
+        },{status:401})
+    }
 
-    const note = await prisma.note.delete({where: {id: id}})
+    const note = await prisma.note.findUnique({where: {id: id}})
+    if(!note) {
+        return NextResponse.json({
+            message: "Note not found"
+        },{status:404})
+    }
+    if (note.created_by_id !== user.id){
+        return NextResponse.json({
+            message: "unauthorized"
+        },{status: 401})
+    }
+    await prisma.note.delete({where: {id: id}})
 
-    return NextResponse.json({"message": "Note deleted", note}, {status:200})
+    return NextResponse.json({"message": "Note deleted"}, {status:200})
 }
 
 export async function PUT(req: NextRequest, {params}: {params: Promise<{id:number}>} ) {
