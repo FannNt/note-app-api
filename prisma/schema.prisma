@@ -11,6 +11,8 @@ model Note {
   id      Int    @unique @default(autoincrement())
   name    String @unique
   message String
+  created_by User? @relation(fields: [created_by_id],references: [id])
+  created_by_id Int
 }
 
 model User {
@@ -18,4 +20,5 @@ model User {
   name     String
   email    String
   password String
+  note Note[]
 }
