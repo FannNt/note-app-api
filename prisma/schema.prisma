@@ -8,17 +8,17 @@ datasource db {
 }
 
 model Note {
-  id      Int    @unique @default(autoincrement())
-  name    String @unique
-  message String
-  created_by User? @relation(fields: [created_by_id],references: [id])
+  id            Int    @unique @default(autoincrement())
+  name          String @unique
+  message       String
   created_by_id Int
+  created_by    User   @relation(fields: [created_by_id], references: [id])
 }
 
 model User {
   id       Int    @unique @default(autoincrement())
   name     String
-  email    String
+  email    String @unique
   password String
-  note Note[]
+  note     Note[]
 }

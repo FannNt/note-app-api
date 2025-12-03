@@ -1,6 +1,7 @@
 import {prisma} from "@/db";
 import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
+import {getUser} from "@/services/JWTService";
 
 export async function GET(req: NextRequest, {params}: {params: Promise<{id:number}>} ) {
 
@@ -28,6 +29,8 @@ export async function PUT(req: NextRequest, {params}: {params: Promise<{id:numbe
         name: z.string(),
         message: z.string().min(3)
     })
+    const user = getUser(req)
+
     const body = await req.json()
     const data = Note.safeParse({
         id:Number((await params).id),
@@ -39,7 +42,20 @@ export async function PUT(req: NextRequest, {params}: {params: Promise<{id:numbe
         return NextResponse.json(error.fieldErrors,{status:400})
     }
     const {id, name, message } = data.data
-    const note = await prisma.note.update({
+    let note = await prisma.note.findUnique({
+        where: {id}
+    })
+    if (!note) {
+        return NextResponse.json({
+            "message": "note not found"
+        }, {status: 404})
+    }
+    if (user.id !== note.created_by_id ) {
+        return NextResponse.json({
+            message: "unauthorized"
+        }, {status: 401})
+    }
+     note = await prisma.note.update({
         data: {
             name,
             message

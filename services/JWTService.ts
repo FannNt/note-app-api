@@ -1,10 +1,12 @@
 import jwt from "jsonwebtoken";
 
-export  function createToken(email:string){
-    return jwt.sign(email, process.env.JWT_SECRET_KEY!)
+export  function createToken(id:number, email:string){
+    return jwt.sign({email,id}, process.env.JWT_SECRET_KEY!)
 }
-export function getUserId(token:string){
-    return jwt.decode(token)
+export function getUser(req: Request){
+    const headers = req.headers.get('x-user');
+    return headers ? JSON.parse(headers) : null
+
 }
 
 export function verifyToken(token:string){

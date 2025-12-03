@@ -14,8 +14,6 @@ export async function POST(req: NextRequest) {
         where: {
             email
         }
-
-
     });
     if(!user){
         return NextResponse.json({message: "password and email wrong"},{
@@ -28,7 +26,7 @@ export async function POST(req: NextRequest) {
             status: 400,
         })
     }
-    const token = createToken(user.email)
+    const token = createToken(user.id,user.email)
     return NextResponse.json({
         id: user.id,
         name: user.name,

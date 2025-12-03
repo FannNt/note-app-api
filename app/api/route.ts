@@ -1,6 +1,7 @@
 import {prisma} from "@/db";
 import {z} from "zod";
 import {NextResponse} from "next/server";
+import {getUser} from "@/services/JWTService";
 
 export async function GET() {
     const notes = await prisma.note.findMany({})
@@ -17,6 +18,7 @@ export async function POST(req: Request) {
         message: z.string().min(5),
     });
 
+    const user = getUser(req)
     const body = await req.json();
     const data = Note.safeParse(body)
     if (!data.success) {
@@ -29,6 +31,7 @@ export async function POST(req: Request) {
         data: {
             name: name,
             message: message,
+            created_by_id: user.id
         }
     })
 
