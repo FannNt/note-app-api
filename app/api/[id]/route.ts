@@ -21,7 +21,7 @@ export async function DELETE(req: NextRequest, {params}: { params: Promise<{ id:
     const note = await prisma.note.delete({where: {id: id}})
 
     return NextResponse.json({"message": "Note deleted", note}, {status:200})
-};
+}
 
 export async function PUT(req: NextRequest, {params}: {params: Promise<{id:number}>} ) {
     const Note = z.object({

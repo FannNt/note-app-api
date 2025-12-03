@@ -25,6 +25,7 @@ export function proxy(req: NextRequest){
                 headers: header
             }
         })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
     }catch(e){
         return NextResponse.json({
             message: "token invalid"
